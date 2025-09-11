@@ -10,15 +10,19 @@ jobs:
     environment:
       name: production
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.11
-    - name: Install dependencies
-      run: pip install -r requirements.txt
-    - name: Upload Model Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: titanic-model
-        path: titanic_model.pkl
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Upload Model Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: titanic-model
+          path: titanic_model.pkl
+          retention-days: 7   # keep artifact for 7 days (default 90)
