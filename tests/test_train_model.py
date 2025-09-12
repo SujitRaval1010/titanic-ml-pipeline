@@ -1,6 +1,6 @@
-import os
-import joblib
+from src.preprocess import load_and_clean
 
-def test_model_file_exists():
-    # Ensure model file exists
-    assert os.path.exists('titanic_model.pkl') or True
+def test_data_loading():
+    X, y = load_and_clean()
+    assert not X.empty
+    assert len(X) == len(y)
