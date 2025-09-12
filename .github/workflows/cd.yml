@@ -2,27 +2,21 @@ name: CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main       # Only trigger CD when main is updated
 
 jobs:
   deploy:
+    name: Deploy to Databricks
     runs-on: ubuntu-latest
-    environment:
-      name: production
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout Repo
+        uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Upload Model Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: titanic-model
-          path: titanic_model.pkl
-          retention-days: 7   # keep artifact for 7 days (default 90)
+      - name: Trigger Databricks Job
+        run: |
+          curl -X POST "${{ secrets.DATABRICKS_HOST }}/api/2.1/jobs/run-now" \
+          --header "Authorization: Bearer ${{ secrets.DATABRICKS_TOKEN }}" \
+          --header "Content-Type: application/json" \
+          -d "{\"job_id\": ${{ secrets.DATABRICKS_JOB_ID }}}"
