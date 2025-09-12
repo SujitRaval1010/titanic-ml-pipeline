@@ -3,13 +3,12 @@ name: CD Pipeline
 on:
   push:
     branches:
-      - main       # Only trigger CD when main is updated
+      - main   # Deploy only when main is updated
 
 jobs:
-  deploy:
+  cd:
     name: Deploy to Databricks
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v3
