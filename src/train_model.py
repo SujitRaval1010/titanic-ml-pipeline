@@ -1,30 +1,27 @@
-import pandas as pd
+import mlflow
+import mlflow.sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
-import joblib
+from src.preprocess import load_and_clean
 
-# Load data
-data = pd.read_csv('data/train.csv')
+def train_model():
+    X, y = load_and_clean()
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Preprocess
-data['Age'].fillna(data['Age'].mean(), inplace=True)
-X = data[['Pclass','Sex','Age','SibSp','Parch','Fare']].copy()
-X['Sex'] = X['Sex'].map({'male':0,'female':1})
-X = X.apply(pd.to_numeric, errors='coerce')
+    clf = RandomForestClassifier(n_estimators=100, random_state=42)
 
-y = data['Survived']
+    with mlflow.start_run():
+        clf.fit(X_train, y_train)
+        acc = clf.score(X_test, y_test)
 
-# Train/test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        # Log parameters & metrics
+        mlflow.log_param("n_estimators", 100)
+        mlflow.log_metric("accuracy", acc)
 
-# Train model
-model = RandomForestClassifier(n_estimators=100)
-model.fit(X_train, y_train)
+        # Log model
+        mlflow.sklearn.log_model(clf, "model")
 
-# Evaluate
-y_pred = model.predict(X_test)
-print("Accuracy:", accuracy_score(y_test, y_pred))
+    print(f"Model trained with accuracy: {acc:.2f}")
 
-# Save model
-joblib.dump(model, 'titanic_model.pkl')
+if __name__ == "__main__":
+    train_model()
