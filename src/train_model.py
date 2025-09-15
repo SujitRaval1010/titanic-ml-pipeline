@@ -1,8 +1,13 @@
+import sys, os
 import mlflow
 import mlflow.sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from src.preprocess import load_and_clean
+
+# 👇 Add project root (one level up) to PYTHONPATH
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from src.preprocess import load_and_clean  # now works fine
 
 def train_model():
     X, y = load_and_clean()
